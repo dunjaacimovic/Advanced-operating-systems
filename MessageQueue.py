@@ -44,14 +44,23 @@ def get_cars_to_the_other_side(direction_zero_queue, direction_one_queue, confir
     direction_is_zero = True
     while True:
         direction_is_zero = not direction_is_zero
-        approve_cars(
-            capacity=[BRIDGE_CAPACITY], 
-            direction_queue=direction_zero_queue if direction_is_zero else direction_one_queue, 
-            confirm_queue=confirm_queue
-        )
+        capacity = [BRIDGE_CAPACITY]
+        # approve_cars(
+        #     capacity=capacity, 
+        #     direction_queue=direction_zero_queue if direction_is_zero else direction_one_queue, 
+        #     confirm_queue=confirm_queue
+        # )
+        start_time = time()
+        direction_time_limit = uniform(0.5, 1.0)
+        while capacity[0] > 0 and (time() - start_time) < direction_time_limit:
+            if handshake(direction_zero_queue if direction_is_zero else direction_one_queue, confirm_queue):
+                capacity[0] -= 1
+            else:
+                break
         simulate_crossing(bridge_queue)
 
-        if  .empty():
+        print("Capacity:", str(capacity[0]))
+        if capacity[0] == BRIDGE_CAPACITY:
             print("There is no more cars.")
             break
         
@@ -59,63 +68,63 @@ def get_cars_to_the_other_side(direction_zero_queue, direction_one_queue, confir
 
     print("------ DONE ------ get_cars_to_the_other_side")
 
-def get_cars_to_the_other_side(direction_zero_queue, direction_one_queue, confirm_queue, bridge_queue):
+# def get_cars_to_the_other_side(direction_zero_queue, direction_one_queue, confirm_queue, bridge_queue):
 
-    while True:
-        capacity = [BRIDGE_CAPACITY]
+#     while True:
+#         capacity = [BRIDGE_CAPACITY]
 
-        while direction_one_queue.empty() and capacity[0] > 2:
-            if handshake(direction_one_queue, confirm_queue):
-                capacity[0] = capacity[0] - 1
-            else:
-                break
+#         while direction_one_queue.empty() and capacity[0] > 2:
+#             if handshake(direction_one_queue, confirm_queue):
+#                 capacity[0] = capacity[0] - 1
+#             else:
+#                 break
 
-        while direction_one_queue.empty() and capacity[0] > 1:
-            if handshake(direction_one_queue, confirm_queue):
-                capacity[0] = capacity[0] - 1
+#         while direction_one_queue.empty() and capacity[0] > 1:
+#             if handshake(direction_one_queue, confirm_queue):
+#                 capacity[0] = capacity[0] - 1
         
-        while direction_one_queue.empty() and capacity[0] > 0:
-            if handshake(direction_one_queue, confirm_queue):
-                capacity[0] = capacity[0] - 1
+#         while direction_one_queue.empty() and capacity[0] > 0:
+#             if handshake(direction_one_queue, confirm_queue):
+#                 capacity[0] = capacity[0] - 1
         
-        sleep(uniform(1.0, 3.0))
-        print("Cars which crossed over are: ")
-        while not bridge_queue.empty():
-            message = bridge_queue.get()
-            print("Bridge receives - " + message)
+#         sleep(uniform(1.0, 3.0))
+#         print("Cars which crossed over are: ")
+#         while not bridge_queue.empty():
+#             message = bridge_queue.get()
+#             print("Bridge receives - " + message)
         
-        print("------ DONE ------ simulate_crossing")
+#         print("------ DONE ------ simulate_crossing")
 
-        capacity = [BRIDGE_CAPACITY]
+#         capacity = [BRIDGE_CAPACITY]
 
-        while direction_zero_queue.empty() and capacity[0] > 2:
-            if handshake(direction_zero_queue, confirm_queue):
-                capacity[0] = capacity[0] - 1
-            else:
-                break
+#         while direction_zero_queue.empty() and capacity[0] > 2:
+#             if handshake(direction_zero_queue, confirm_queue):
+#                 capacity[0] = capacity[0] - 1
+#             else:
+#                 break
 
-        while direction_zero_queue.empty() and capacity[0] > 1:
-            if handshake(direction_zero_queue, confirm_queue):
-                capacity[0] = capacity[0] - 1
+#         while direction_zero_queue.empty() and capacity[0] > 1:
+#             if handshake(direction_zero_queue, confirm_queue):
+#                 capacity[0] = capacity[0] - 1
         
-        while direction_zero_queue.empty() and capacity[0] > 0:
-            if handshake(direction_zero_queue, confirm_queue):
-                capacity[0] = capacity[0] - 1
+#         while direction_zero_queue.empty() and capacity[0] > 0:
+#             if handshake(direction_zero_queue, confirm_queue):
+#                 capacity[0] = capacity[0] - 1
         
-        sleep(uniform(1.0, 3.0))
-        print("Cars which crossed over are: ")
-        while not bridge_queue.empty():
-            message = bridge_queue.get()
-            print("Bridge receives - " + message)
+#         sleep(uniform(1.0, 3.0))
+#         print("Cars which crossed over are: ")
+#         while not bridge_queue.empty():
+#             message = bridge_queue.get()
+#             print("Bridge receives - " + message)
         
-        print("------ DONE ------ simulate_crossing")
+#         print("------ DONE ------ simulate_crossing")
 
-        if (capacity[0] == BRIDGE_CAPACITY):
-            print("There is no more cars.")
-            break
-        print("------ DONE ------ get_cars_to_the_other_side - ITERATION")
-        break
-    print("------ DONE ------ get_cars_to_the_other_side")
+#         if (capacity[0] == BRIDGE_CAPACITY):
+#             print("There is no more cars.")
+#             break
+#         print("------ DONE ------ get_cars_to_the_other_side - ITERATION")
+#         break
+#     print("------ DONE ------ get_cars_to_the_other_side")
         
 
 def approve_cars(capacity, direction_queue, confirm_queue):
