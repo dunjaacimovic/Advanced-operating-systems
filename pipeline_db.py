@@ -1,48 +1,53 @@
-from multiprocessing import Process, Pipe, active_children
-from random import uniform, randint
+from ctypes import Structure, c_int
+from random import randint, uniform
 from time import sleep
+import multiprocessing
 
-database = []
+class DBEntry(Structure):
+    _fields_ = [('id', c_int), ('logical_clock', c_int), ('cs_entries', c_int)]
 
-class DBEntry:
-
-    def __init__(self, id, logical_clock, cs_entries):
-        self.id = id
-        self.logical_clock = logical_clock
-        self.cs_entries = cs_entries
-
-    def update(self, logical_clock_update):
-        self.logical_clock = logical_clock_update
-        self.cs_entries += 1
-
-    def __str__(self):
-        return "ID: " + str(self.id) + " - LCLOCK: " + str(self.logical_clock) + " - CS ENTRIES: " + str(self.cs_entries)
-    
-    def __repr__(self):
-        return "ID: " + str(self.id) + " - LCLOCK: " + str(self.logical_clock) + " - CS ENTRIES: " + str(self.cs_entries)
-    
-    
-def critical_section(conn, i, logical_clock):
+def critical_section(database, conn, i, logical_clock):
     print(i, logical_clock)
-    # database[i].update(logical_clock)
-    for db_entry in database: 
-        print(db_entry)
-    # sleep(uniform(0.1, 2.0))
+    database[i].logical_clock = logical_clock
+    database[i].cs_entries += 1
+
+    # Printing 
+    print("Database (in process):")
+    for entry in database:
+        print(entry.id, entry.logical_clock, entry.cs_entries)
+    sleep(uniform(0.1, 2.0))
+    
     conn.send("All done w/ critical section")
     conn.close()
-    
-
-# def f(conn):
-#     conn.send("hello from critical section")
-#     conn.close()
 
 if __name__ == '__main__':
-    for id in range(randint(3, 10)):
-        database.append(DBEntry(id, 0, 0))
+
+    # create database
+    n = randint(3, 10)
+    database = multiprocessing.Array(DBEntry, [(i, 0, 0) for i in range(n)])
     
-    # critical_section(1, 1)
-    parent_conn, child_conn = Pipe()
-    p = Process(target=critical_section, args=(child_conn, 1, 1))
-    p.start()
-    print(parent_conn.recv())   # prints "[42, None, 'hello']"
-    p.join()
+    # create pipe matrix 
+    matrix = [[False for _ in range(n)] for _ in range(n)]
+    for row in range(n):
+        for column in range(row + 1, n):
+            matrix[row][column], matrix[column][row] = multiprocessing.Pipe()
+
+    # create processes
+    processes = []
+    for i in range(n):
+        processes.append(multiprocessing.Process(target=critical_section, args=(database, pipe_matrix[i])))
+        processes[i].start()
+
+    for i in range(n):
+        processes[i].join()
+
+    # p = multiprocessing.Process(target=critical_section, args=(database, child_conn, 1, 1))
+    # p.start()
+    # print(parent_conn.recv())   # prints ""All done w/ critical section""
+    # p.join()
+
+    # Printing
+    print("Database (in main program): ")
+    for entry in database:
+        print(entry.id, entry.logical_clock, entry.cs_entries)
+
