@@ -6,6 +6,10 @@ import multiprocessing
 class DBEntry(Structure):
     _fields_ = [('id', c_int), ('logical_clock', c_int), ('cs_entries', c_int)]
 
+def work_with_database(database, conn, i, logical_clock):
+    request = (database[i].logical_clock, "REQUEST", database[i].id)
+    # critical_section(database, conn, i, logical_clock)
+
 def critical_section(database, conn, i, logical_clock):
     print(i, logical_clock)
     database[i].logical_clock = logical_clock
@@ -35,7 +39,7 @@ if __name__ == '__main__':
     # create processes
     processes = []
     for i in range(n):
-        processes.append(multiprocessing.Process(target=critical_section, args=(database, pipe_matrix[i])))
+        processes.append(multiprocessing.Process(target=work_with_database, args=(database, pipe_matrix[i])))
         processes[i].start()
 
     for i in range(n):
