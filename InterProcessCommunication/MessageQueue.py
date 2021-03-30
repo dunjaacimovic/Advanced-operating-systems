@@ -5,7 +5,7 @@ from random import uniform, randint
 
 # Constants
 DIRECTION_ZERO = 8
-DIRECTION_ONE = 4
+DIRECTION_ONE = 7
 BRIDGE_CAPACITY = 3 
 
 def produce_direction(direction, direction_queue, confirm_queue, road_queue):
@@ -19,7 +19,6 @@ def produce_direction(direction, direction_queue, confirm_queue, road_queue):
 def cross_the_bridge(licence_plate, direction_queue, confirm_queue, bridge_queue):
     # Sleep 
     sleep(uniform(0.1, 2.0))
-    # print(licence_plate, "WOKE UP")
 
     # Wait for the bridge
     message = direction_queue.get(timeout=None)
