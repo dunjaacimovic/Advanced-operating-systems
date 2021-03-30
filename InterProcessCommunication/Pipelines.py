@@ -3,7 +3,7 @@ from ctypes import Structure, c_int, c_bool
 from enum import Enum
 from time import sleep
 from heapq import heappush, heappop
-from random import randint
+from random import randint, uniform
 from functools import reduce
 
 TIMEOUT = 1.0/3.0
@@ -61,6 +61,7 @@ class DBEntry:
     def wait_for_your_turn(self):
         while not len(self.replies) == len(self.pipes) - 1:
             self.receive_messages()
+
     def delete_replies(self):
         self.replies = []
 
@@ -74,7 +75,7 @@ class DBEntry:
                 self.pipes[sender_ID].send(reply) 
             except IndexError:
                 break
-    def structure(self):
+    def update_structure(self):
         self.cs_entries += 1
         return DBEntryStruct(self.ID, self.clock, self.cs_entries)
         
@@ -94,12 +95,12 @@ def work(ID, pipes, database, active_entries):
 def enter_database(db_entry, database, active_entries):
     db_entry.delete_replies()
     db_entry.say("--- DATABASE ---", database=True)
-    database[db_entry.ID] = db_entry.structure()
+    database[db_entry.ID] = db_entry.update_structure()
     for entry in database:
         db_entry.say("[ID: " + str(entry.id) + " - C: " + str(entry.clock) + " - E: " + str(entry.cs_entries) + "]", database=True)
     active_entries.value = reduce(lambda num1, num2: num1 + num2, [1 if e.cs_entries == NUMBER_OF_ENTRIES else 0 for e in database]) != len(database)
     db_entry.say("................", database=True)
-    
+    sleep(uniform(0.1, 2))
 
 def wait_until_they_all_finish():
     active_process = multiprocessing.active_children()
