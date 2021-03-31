@@ -1,6 +1,5 @@
 # Algorithms for mutual exclusion in a distributed system
 ## Lamportov protokol 
-=====================================================
 
 P1: c1=12 red_zahtjeva: 
 P2: c2=7  red_zahtjeva: 
@@ -89,7 +88,6 @@ P2: c2=25, red zahtjeva:
 P3: c3=24, red zahtjeva:
 
 ## Ricart i Agrawala
-=====================================================
 
 c1 = 12
 c2 = 7
