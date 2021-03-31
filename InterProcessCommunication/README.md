@@ -87,6 +87,8 @@ P1: c1=24, red zahtjeva:
 P2: c2=25, red zahtjeva:
 P3: c3=24, red zahtjeva:
 
+---------------------------------------------------------
+
 
 
 ## Ricart i Agrawala
