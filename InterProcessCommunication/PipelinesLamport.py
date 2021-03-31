@@ -6,7 +6,6 @@ from heapq import heappush, heappop
 from random import randint
 
 TIMEOUT = 1.0/3.0
-SIZE_OF_DATABASE = 10
 
 class Message(Enum):
     request = "REQUEST"
@@ -54,7 +53,7 @@ class DBEntry:
             self.replies.append(message)
 
     def say(self, text):
-        print(self.ID * "\t" + str(self.ID) + "[" + str(self.clock) + "]: " + text)
+        print(self.ID * 4 * "\t" + str(self.ID) + "[" + str(self.clock) + "]: " + text)
 
 
     def send_request(self):
@@ -67,9 +66,8 @@ class DBEntry:
             if pipe != False: pipe.send(request)
 
     def wait_for_your_turn_to_eat(self):
-        while not (self.request_queue[0][2] == self.ID and len(self.replies) == (SIZE_OF_DATABASE - 1)):
+        while not (self.request_queue[0][2] == self.ID and len(self.replies) == (len(self.pipes) - 1)):
             self.receive_messages()
-        print(len(self.replies))
 
     def delete_replies(self):
         self.replies = []
@@ -88,14 +86,14 @@ def work(ID, pipes, database):
     for _ in range(5):
         db_entry.receive_messages()
         enter_database(db_entry, database)
-        # db_entry.receive_messages()
+        db_entry.receive_messages()
 
 def enter_database(db_entry, database):
     db_entry.send_request()
     db_entry.wait_for_your_turn_to_eat()
     db_entry.delete_replies()
     db_entry.say("--- Writing ---")
-    sleep(20)
+    sleep(2)
     db_entry.say("... Done writing ...")
     sleep(1)
     db_entry.send_release()
@@ -103,7 +101,6 @@ def enter_database(db_entry, database):
 def wait_until_they_all_finish():
     active_processes = multiprocessing.active_children()
     while (active_processes):
-        print("Sleeping until they finish philosophizing...")
         sleep(10)
         active_processes = multiprocessing.active_children()
 
@@ -112,8 +109,7 @@ if __name__ == '__main__':
 
     multiprocessing.freeze_support()
     #create database
-    # n = randint(3, 10)
-    n = 10
+    n = 4
     database = multiprocessing.Array(DBEntryStruct, [(i, 0, 0) for i in range(n)])
 
     #create pipe matrix 
@@ -122,12 +118,10 @@ if __name__ == '__main__':
         for column in range(row + 1, n):
             pipe_matrix[row][column], pipe_matrix[column][row] = multiprocessing.Pipe()
         
-    print("Done with pipe-matrix.")
     #create and start processes
     for i in range(n):
         entry = multiprocessing.Process(target=work, args=(i, pipe_matrix[i], database,))
         entry.start()
-    print("Started all processes")
     
     wait_until_they_all_finish()
 
