@@ -1,6 +1,6 @@
 # Advanced-operating-systems
 
-Inter-process communication 
+## Inter-process communication 
 - Message Queue
 - Pipelines
   - Lamport
